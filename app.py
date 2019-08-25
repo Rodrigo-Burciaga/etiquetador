@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import os
 import random
-from flask import Flask, render_template,jsonify,request,redirect,url_for,json,Response,send_file,send_from_directory
+from flask import Flask, render_template,jsonify,request,redirect,url_for,json,\
+abort, Response,send_file,send_from_directory, flash
 from datetime import datetime
 from werkzeug.datastructures import ImmutableMultiDict
 from pprint import pprint
@@ -173,7 +174,6 @@ def conForm():
 
 @app.route('/jsonDat',methods=['POST']) 
 def jsonDat():
-    print("entrando")
     
     dataJ = "{"
     
@@ -250,6 +250,33 @@ def evaluaValor(valor):
 @app.route('/favicon.ico') 
 def favicon(): 
     return send_from_directory(os.path.join(app.static_folder,'/images/'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+###################################################
+
+@app.errorhandler(400)
+def page_not_found(e):
+    return render_template('400.html'), 400
+
+@app.route('/show_files/<path>')
+def show_files(path):
+    try:
+        list_files = os.listdir(os.path.join(app.static_folder, path))
+        if not list_files:
+            flash('No hay archivos en el directorio')
+        return render_template("show_files.html", path=path, list_files=list_files)
+    except FileNotFoundError as e:
+        print('Archivo no encontrado')
+        abort(404, description="Resource not found")
+
+@app.route('/download_file', methods=['POST'])
+def download_file():
+    if not request.form['file_name'] or not request.form['path']:
+        return abort(400, description="No provided file name")
+    try:
+        return send_file(os.path.join(app.static_folder,\
+        request.form['path'], request.form['file_name']), as_attachment=True)
+    except Exception as e:
+        abort(404, description="Resource not found")
     
 if __name__=="__main__":
     app.run(threaded=True,host="0.0.0.0", debug=True, port=5000)
