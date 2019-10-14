@@ -7,7 +7,7 @@
 		<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
 </head>
     <body>
-        <form method="POST" action="conForm" enctype="multipart/form-data">
+        <form method="POST" action="/etiquetador/conForm" enctype="multipart/form-data">
             Cargar JSON original <input type="file" id="fileinput" name="fileJson"/> <br><br><br>
             Cargar JSON etiqueado <input type="file" id="fileinput" name="contJson"/> 
             <input type="submit" id="loadJ" value="OK">
