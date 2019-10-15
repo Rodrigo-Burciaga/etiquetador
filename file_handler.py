@@ -79,8 +79,8 @@ def download_file():
     try:
         return send_file(os.path.join(app.static_folder,
                                       request.form['path'], request.form['file_name']), as_attachment=True)
-    except Exception:
-        abort(404, description="Resource not found")
+    except Exception as e:
+        abort(404, description="Resource not found" + str(e))
 
 
 def unzip(relative_file_name, relative_current_path):

@@ -308,7 +308,7 @@ def show_files(path):
         list_files = os.listdir(os.path.join(app.static_folder, path))
         if not list_files:
             flash('No hay archivos en el directorio')
-        return render_template("show_files.html", path=path, list_files=list_files)
+        return render_template("show_files__1.html", path=path, list_files=list_files)
     except FileNotFoundError as e:
         print('Archivo no encontrado')
         abort(404, description="Resource not found")
