@@ -1,25 +1,34 @@
 $(function () {
 
-    var bar = $(".bar");
-    var percent = $('.percent');
-    var status = $("#status");
+    let bar = $(".bar");
+    let percent = $('.percent');
+    let status = $("#status");
 
     $('form').ajaxForm({
         beforeSend: function () {
             status.empty();
-            var percentVal = '0%';
+            let percentVal = '0%';
             bar.width(percentVal);
             percent.html(percentVal);
         },
         uploadProgress: function (event, position, total, percentComplete) {
-            var percentVal = percentComplete + '%';
+            let percentVal = percentComplete + '%';
             bar.width(percentVal);
             percent.html(percentVal);
         },
         complete: function (xhr) {
-            console.log(xhr.responseText);
             status.html(xhr.responseText);
         }
     });
+});
+
+$(function () {
+    $('input:file').change(
+        function () {
+            if ($(this).val()) {
+                $('input:submit').attr('disabled', false);
+            }
+        }
+    );
 });
 
