@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import os
-from flask import Flask, Blueprint, render_template, jsonify, request, redirect, url_for, json, Response, send_file, \
-    send_from_directory
-import random
 from datetime import datetime
+
+from flask import Flask, render_template, jsonify, request, json, send_from_directory
 from flask_reverse_proxy_fix.middleware import ReverseProxyPrefixFix
+
 from file_handler import file_handler, UPLOAD_FOLDER
 
 
@@ -287,7 +287,6 @@ def evaluaValor(valor):
     return valor
 
 
-
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.static_folder, '/images/'), 'favicon.ico',
@@ -296,4 +295,3 @@ def favicon():
 
 if __name__ == "__main__":
     app.run(threaded=True, host="0.0.0.0", debug=True, port=5000)
-

@@ -1,14 +1,11 @@
-import logging
-import os
-import zipfile
-
 from flask import Blueprint, render_template, abort, request, flash, \
     send_file
-from flask import current_app as app
 from werkzeug.utils import secure_filename
 
+from utils.file_utils import *
+
 UPLOAD_FOLDER = './static/images'
-ALLOWED_EXTENSIONS = {'zip', 'rar', '7z'}
+
 file_handler = Blueprint('files', __name__,
                          template_folder='templates/files')
 
@@ -21,28 +18,19 @@ def file_index():
 @file_handler.route('/upload_file', methods=['POST'])
 @file_handler.route('/upload_file', methods=['POST'])
 def upload_file():
-    if 'file' not in request.files:
-        return 'No se pudo obtener el archivo'
-    file = request.files['file']
-    if file.filename == '':
-        return 'no seleccionaste ningún archivo'
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        relative_file_name = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(relative_file_name)
-        try:
-            unzip(relative_file_name, os.path.join(app.config['UPLOAD_FOLDER']))
-        except Exception as e:
-            return str(e)
+    try:
+        verify_exists_file_in_request(request)
+        file = request.files['file']
+        verify_not_empty_name_file(file)
+        if verify_not_empty_and_valid_file(file):
+            file_name = secure_filename(file.filename)
+            save_file(file_name, file)
+            unzip_file_and_remove_after_zip(file_name, relative_current_path=os.path.join(app.config['UPLOAD_FOLDER']))
+            remove_not_images_from_unzipped_folder(file_name)
 
-        delete_zip(relative_file_name)
-        return "guardado exitosamente"
-    return 'Tu archivo no esta permitido'
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+            return "guardado exitosamente"
+    except Exception as e:
+        return str(e)
 
 
 @file_handler.errorhandler(400)
@@ -74,16 +62,3 @@ def download_file():
                                       request.form['path'], request.form['file_name']), as_attachment=True)
     except Exception as e:
         abort(404, description="Resource not found" + str(e))
-
-
-def unzip(relative_file_name, relative_current_path):
-    try:
-        with zipfile.ZipFile(relative_file_name, 'r') as zip_ref:
-            zip_ref.extractall(relative_current_path)
-    except Exception as e:
-        logging.error(e)
-        raise Exception('No es un archivo zip')
-
-
-def delete_zip(relative_file_name):
-    os.remove(relative_file_name)

@@ -1,3 +1,5 @@
+let allowedExtensions = ['zip', 'rar', '7z'];
+
 $(function () {
 
     let bar = $(".bar");
@@ -15,6 +17,9 @@ $(function () {
             let percentVal = percentComplete + '%';
             bar.width(percentVal);
             percent.html(percentVal);
+            if (percentComplete === 100) {
+                status.html('Se está procesando tu archivo, espera un momento');
+            }
         },
         complete: function (xhr) {
             status.html(xhr.responseText);
@@ -26,9 +31,34 @@ $(function () {
     $('input:file').change(
         function () {
             if ($(this).val()) {
-                $('input:submit').attr('disabled', false);
+                let fileName = getFileName($(this).val());
+                if (allowedExtensions.includes(fileName)) {
+                    enableButtonSubmitDisabled(false);
+                    $("#status").html('');
+                } else {
+                    $("#status").html('Archivo no permitido');
+                    enableButtonSubmitDisabled(true);
+                }
             }
         }
     );
 });
 
+$(".custom-file-input").on("change", function () {
+    var fileName = $(this).val().split("\\").pop();
+    $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+});
+
+
+function enableButtonSubmitDisabled(value) {
+    let submitButton = $('input:submit');
+    submitButton.attr('disabled', value);
+}
+
+function getFileName(filePath) {
+    return filePath.substr(filePath.lastIndexOf('\\') + 1).split('.')[1].toLowerCase();
+}
+
+function regresar() {
+    window.location = '/etiquetador';
+}
