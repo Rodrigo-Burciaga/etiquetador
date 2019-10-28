@@ -19,17 +19,19 @@
         </div>
     </div>
 
-    <form method="post" enctype="multipart/form-data" action="{{ url_for('files.upload_file') }}">
+    <form method="post" enctype="multipart/form-data" action="{{ url_for('files.upload_file') }}" id="formFile">
         <div class="row padding">
-            <div class="col-lg-6 d-flex align-items-center">
+            <div class="col-lg-6 col-md-6 col-sm-6 d-flex align-items-center">
                 <div class="custom-file">
                     <input type="file" class="custom-file-input" id="fileButton" name="file">
                     <label class="custom-file-label" for="customFile">Selecciona el archivo</label>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <input type="submit" value="Subir" disabled class="btn btn-primary">
-                <input type="button" value="Regresar" class="btn btn-warning" onclick="regresar()">
+            <div class="col-lg-6 col-md-6 col-sm-6" id="buttons">
+                <input type="submit" value="Subir" disabled class="btn btn-primary" onclick="enableCancelButton(true)">
+                <input type="button" value="Cancelar" id="cancelButton" class="btn btn-danger" onclick="cancelUpload()"
+                       disabled>
+                <input type="button" value="Regresar" class="btn btn-warning" onclick="getBack()">
             </div>
 
         </div>

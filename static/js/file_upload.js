@@ -1,7 +1,34 @@
 let allowedExtensions = ['zip', 'rar', '7z'];
 
-$(function () {
 
+$(function () {
+    createAjaxForm();
+});
+
+$(function () {
+    $('input:file').change(
+        function () {
+            if ($(this).val()) {
+                let fileName = getFileName($(this).val());
+                if (allowedExtensions.includes(fileName)) {
+                    enableButtonSubmit(true);
+                    $("#status").html('');
+                } else {
+                    $("#status").html('Archivo no permitido');
+                    enableButtonSubmit(false);
+                }
+            }
+        }
+    );
+});
+
+$(function () {
+    if (!$('input:file').val()) {
+        enableButtonSubmit(false);
+    }
+});
+
+function createAjaxForm() {
     let bar = $(".bar");
     let percent = $('.percent');
     let status = $("#status");
@@ -23,42 +50,41 @@ $(function () {
         },
         complete: function (xhr) {
             status.html(xhr.responseText);
-        }
-    });
-});
-
-$(function () {
-    $('input:file').change(
-        function () {
-            if ($(this).val()) {
-                let fileName = getFileName($(this).val());
-                if (allowedExtensions.includes(fileName)) {
-                    enableButtonSubmitDisabled(false);
-                    $("#status").html('');
-                } else {
-                    $("#status").html('Archivo no permitido');
-                    enableButtonSubmitDisabled(true);
-                }
-            }
-        }
-    );
-});
+        },
+        clearForm: true,
+        resetForm: true
+    })
+}
 
 $(".custom-file-input").on("change", function () {
-    var fileName = $(this).val().split("\\").pop();
+    let fileName = $(this).val().split("\\").pop();
     $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
 });
 
 
-function enableButtonSubmitDisabled(value) {
+function enableButtonSubmit(value) {
     let submitButton = $('input:submit');
-    submitButton.attr('disabled', value);
+    submitButton.attr('disabled', !value);
 }
 
 function getFileName(filePath) {
     return filePath.substr(filePath.lastIndexOf('\\') + 1).split('.')[1].toLowerCase();
 }
 
-function regresar() {
+function getBack() {
     window.location = '/etiquetador';
+}
+
+function enableCancelButton(value) {
+    $('#cancelButton').attr('disabled', !value);
+}
+
+function cancelUpload() {
+    let form = $('#formFile').ajaxForm();
+    let xhr = form.data('jqxhr');
+    xhr.abort();
+    $(".bar").width(0);
+    $('.percent').html('');
+    enableCancelButton(false);
+    createAjaxForm();
 }
